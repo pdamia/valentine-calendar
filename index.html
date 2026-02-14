@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countdown Calendar 💌</title>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  font-family: 'Comfortaa', cursive;
+  background: linear-gradient(135deg,#FFF0F5,#FFE4F2);
+  margin: 0;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  color: #FF4FA3;
+  text-align: center;
+}
+
+.countdown {
+  color: #C71585;
+  font-size: 1.4rem;
+  margin-bottom: 2rem;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
+  gap: 1rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+.week-card {
+  background: #FFE4E1;
+  border-radius: 15px;
+  padding: 1rem;
+  text-align: center;
+  transition: 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.week-card.unlocked {
+  cursor: pointer;
+  background: #FFB6C1;
+}
+
+.week-card.unlocked:hover {
+  transform: translateY(-4px);
+}
+
+.status {
+  display: block;
+  margin-top: 0.5rem;
+  color: #C71585;
+  font-size: 0.85rem;
+}
+
+/* Overlay */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(6px);
+  z-index: 5;
+}
+
+/* Popup */
+.popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: #FFF0F5;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+  width: 90%;
+  max-width: 520px;
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 10;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.popup.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.popup h2 {
+  color: #FF1493;
+  margin-top: 0;
+}
+
+.popup img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 15px;
+  margin-top: 12px;
+  background: #fff;
+}
+
+
+.popup audio,
+.popup iframe {
+  width: 100%;
+  margin-top: 12px;
+  border-radius: 12px;
+}
+
+.popup button.close {
+  background: #FF69B4;
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.slider-wrapper {
+  position: relative;
+  margin-top: 12px;
+}
+
+.photo-slider {
+  display: flex;
+  overflow: hidden;
+  scroll-behavior: smooth;
+}
+
+.photo-slider img {
+  min-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 15px;
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,105,180,0.8);
+  border: none;
+  color: white;
+  font-size: 22px;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.arrow.left {
+  left: -10px;
+}
+
+.arrow.right {
+  right: -10px;
+}
+
+.arrow:hover {
+  background: #FF1493;
+}
+
+
+/* Hearts */
+.heart {
+  position: absolute;
+  font-size: 1.5rem;
+  animation: floatUp 2s ease-out forwards;
+}
+
+@keyframes floatUp {
+  0% { opacity:1; transform: translateY(0) scale(1); }
+  100% { opacity:0; transform: translateY(-100px) scale(1.5); }
+}
+</style>
+</head>
+
+<body>
+
+<h1>Happy Valentine's Day 💗</h1>
+<p class="countdown" id="countdown"></p>
+
+<div class="calendar">
+  <div class="week-card" data-week="1" data-unlock="2026-02-14">Εβδομάδα 1<span class="status"></span></div>
+  <div class="week-card" data-week="2" data-unlock="2026-02-21">Εβδομάδα 2<span class="status"></span></div>
+  <div class="week-card" data-week="3" data-unlock="2026-02-28">Εβδομάδα 3<span class="status"></span></div>
+  <div class="week-card" data-week="4" data-unlock="2026-03-07">Εβδομάδα 4<span class="status"></span></div>
+  <div class="week-card" data-week="5" data-unlock="2026-03-14">Εβδομάδα 5<span class="status"></span></div>
+  <div class="week-card" data-week="6" data-unlock="2026-03-21">Εβδομάδα 6<span class="status"></span></div>
+  <div class="week-card" data-week="7" data-unlock="2026-03-28">Εβδομάδα 7<span class="status"></span></div>
+  <div class="week-card" data-week="8" data-unlock="2026-04-04">Εβδομάδα 8<span class="status"></span></div>
+  <div class="week-card" data-week="9" data-unlock="2026-04-11">Εβδομάδα 9<span class="status"></span></div>
+  <div class="week-card" data-week="10" data-unlock="2026-04-18">Εβδομάδα 10<span class="status"></span></div>
+  <div class="week-card" data-week="11" data-unlock="2026-04-25">Εβδομάδα 11<span class="status"></span></div>
+  <div class="week-card" data-week="12" data-unlock="2026-05-02">Εβδομάδα 12<span class="status"></span></div>
+  <div class="week-card" data-week="13" data-unlock="2026-05-09">Εβδομάδα 13<span class="status"></span></div>
+  <div class="week-card" data-week="14" data-unlock="2026-05-16">Εβδομάδα 14<span class="status"></span></div>
+  <div class="week-card" data-week="15" data-unlock="2026-05-23">Εβδομάδα 15 ✨<span class="status"></span></div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="popup" id="popup">
+  <h2 id="popup-title"></h2>
+  <div id="popup-content"></div>
+  <button class="close" id="popup-close">Close</button>
+</div>
+
+<script>
+const countdownEl = document.getElementById('countdown');
+const meetDate = new Date("2026-05-23");
+
+function updateCountdown(){
+  const now = new Date();
+  const diff = meetDate - now;
+  const days = Math.floor(diff/(1000*60*60*24));
+  countdownEl.textContent = `${days} μέρες μέχρι να σε δω!`;
+}
+updateCountdown();
+setInterval(updateCountdown,1000*60*60);
+
+  const weekMessages = {
+    1: `
+      <p>Happy Valentine's Day! 💌 Ας ξεκινήσουμε παραγγέλνωντας το αγαπημένο μας fast food!😄</p>
+      <img src="images/1.jpg" alt="Pasta" style="width:100%; border-radius:10px; margin-top:10px;">
+      <p>Μετά βλέπουμε ταινία ή anime;🎬</p>
+      <audio controls style="width:100%; margin-top:10px;">
+        <source src="music/1.mp3" type="audio/mpeg">
+      </audio>
+    `,
+    2: `
+      <p>Εβδομάδα Καρναβαλιού! Πως μεταμφιέστηκε φέτος το πουουκάκι;🥸 </p>
+      <img src="images/2.jpg" style="width:100%; border-radius:10px; margin-top:10px;">
+      <audio controls style="width:100%; margin-top:10px;">
+        <source src="music/2.mp3" type="audio/mpeg">
+      </audio>
+    `,
+    3: `
+      <p>Μικρές στιγμές, μεγάλα χαμόγελα 😄</p>
+      <img src="images/3.jpg" style="width:100%; border-radius:10px; margin-top:10px;">
+      <audio controls style="width:100%; margin-top:10px;">
+        <source src="music/3.mp3" type="audio/mpeg">
+      </audio>
+    `,
+    4: `
+      <p>Είσαι ο καλύτερος συνεργάτης σε όλα ♟️ Είσαι για ένα διαγωνισμό σκάκι; Όποιος κερδίζει χρωστά χάρη🙃</p>
+      <img src="images/4.jpg" style="width:100%; border-radius:10px; margin-top:10px;">
+      <audio controls style="width:100%; margin-top:10px;">
+        <source src="music/4.mp3" type="audio/mpeg">
+      </audio>
+    `,
+    5: `
+      <p>Μια εβδομάδα πιο κοντά σε μένα 🤍😌 </p>
+      <img src="images/5.jpg" style="width:100%; border-radius:10px; margin-top:10px;">
+      <audio controls style="width:100%; margin-top:10px;">
+        <source src="music/5.mp3" type="audio/mpeg">
+      </audio>
+      
+    `,
+    6: `
+      <p>B-day Week!!!🎊 Τι να κάνει ο πούουκκο φέτος;🫣</p>
+      <img src="images/6.jpg" style="width:100%; border-radius:10px; margin-top:10px;">
+      <audio controls style="width:100%; margin-top:10px;">
+        <source src="music/6.mp3" type="audio/mpeg">
+      </audio>
+    `,
+    7: `
+      <p>Halfway there! 🫶.</p>
+      <img src="images/7.jpg" style="width:100%; border-radius:10px; margin-top:10px;">
+      <audio controls style="width:100%; margin-top:10px;">
+        <source src="music/7.mp3" type="audio/mpeg">
+      </audio>
+    `,
+    8: `
+      <p>Ήρθε η ώρα για...Japan Iterinary😁</p>
+      <img src="images/8.jpg" style="width:100%; border-radius:10px; margin-top:10px;">
+      <audio controls style="width:100%; margin-top:10px;">
+        <source src="music/8.mp3" type="audio/mpeg">
+      </audio>
+    `,
+    9: `
+      <p>Μικρά πράγματα που θυμάμαι και με κάνουν χαρούμενη… 💭</p>
+      <div class="slider-wrapper">
+        <button class="arrow left">&#10094;</button>
+
+        <div class="photo-slider">
+          <img src="images/9_1.jpg">
+          <img src="images/9_2.jpg">
+          <img src="images/9_3.jpg">
+          <img src="images/9_4.jpg">
+          <img src="images/9_5.jpg">
+        </div>
+
+        <button class="arrow right">&#10095;</button>
+      </div>
+
+      <audio controls style="width:100%; margin-top:10px;">
+        <source src="music/9.mp3" type="audio/mpeg">
+      </audio>
+    `,
+    10: `
+      <p>Ας μοιραστούμε ένα όνειρο μας! 🌙</p>
+      <img src="images/10.jpg" style="width:100%; border-radius:10px; margin-top:10px;">
+      <audio controls style="width:100%; margin-top:10px;">
+        <source src="music/10.mp3" type="audio/mpeg">
+      </audio>
+    `,
+    11: `
+      <p> My anime movie playlist so far… can’t wait to add more! 🎵✨ Μάντεψε το αγαπημένο μου! Την απάντηση θα την πάρεις την επόμενη εβδομάδα ☺️</p>
+      <img src="images/11.jpg" style="width:100%; border-radius:10px; margin-top:10px;">
+      <a href="https://youtube.com/playlist?list=PLDYcf5w1PspvznJfK4-N2-3Cnhqx1o4ay&si=90U7Xvcwbf5-dWaJ" target="_blank">Playlist 🎶</a>
+      <audio controls style="width:100%; margin-top:10px;">
+        <source src="music/11.mp3" type="audio/mpeg">
+      </audio>
+    `,
+    12: `
+      <p>Την αγάπη μας από όλη την οικογένεια 🐾🐇🐽 Μας λείπεις💞</p>
+      <img src="images/12.jpg" style="width:100%; border-radius:10px; margin-top:10px;">
+      <audio controls style="width:100%; margin-top:10px;">
+        <source src="music/12.mp3" type="audio/mpeg">
+      </audio>
+    `,
+    13: `
+      <p>Λίγες μέρες ακόμα! 💓 3 πράγματα που ανυπομονώ να κάνουμε μαζί αυτό το καλοκαίρι.</p>
+      <ol>
+        <li>Να ταξιδέψουμε, να πάμε εκδρομές! 🏞️</li>
+        <li>Να μου μαγειρέψεις ξανά το υπέροχο στέικ σου, το οποίο θα φάω όοοολο! 😋</li>
+        <li>Να απλώσουμε ζάμπα, όπως μας έμαθε το μικρό αγγελικό πεπερονάκι! 🤪</li>
+      </ol>
+      <div class="slider-wrapper">
+        <button class="arrow left">&#10094;</button>
+
+        <div class="photo-slider">
+          <img src="images/13_1.jpg">
+          <img src="images/13_2.jpg">
+          <img src="images/13_3.jpg">
+
+        </div>
+
+        <button class="arrow right">&#10095;</button>
+      </div>
+      <audio controls style="width:100%; margin-top:10px;">
+        <source src="music/13.mp3" type="audio/mpeg">
+      </audio>
+    `,
+    14: `
+      <p>Σχεδόν εκεί! 💖 Ήρθε η ώρα για τον χορό του...</p>
+      <img src="videos/1.gif" alt="Χορευτικό GIF" style="width:100%; border-radius:10px; margin-top:10px;">
+      <audio controls style="width:100%; margin-top:10px;">
+        <source src="music/14.mp3" type="audio/mpeg">
+      </audio>
+    `,
+    15: `
+      <p>ΕΦΤΑΣΑ! 👩‍❤️‍👨 Θα μου κάνεις μια αγκαλιά; 🤗</p>
+      <img src="images/15.jpg" style="width:100%; border-radius:10px; margin-top:10px;">
+      <audio controls style="width:100%; margin-top:10px;">
+        <source src="music/15.mp3" type="audio/mpeg">
+      </audio>
+    `
+  };
+
+        /* Hearts <iframe width="100%" height="200" src="https://www.youtube.com/embed/VIDEO_ID_1" style="border-radius:10px; margin-top:10px;" frameborder="0" allowfullscreen></iframe> */
+
+const weekCards = document.querySelectorAll('.week-card');
+const today = new Date();
+const popup = document.getElementById('popup');
+const popupTitle = document.getElementById('popup-title');
+const popupContent = document.getElementById('popup-content');
+const overlay = document.getElementById('overlay');
+const popupClose = document.getElementById('popup-close');
+
+weekCards.forEach(card=>{
+  const weekNum = card.dataset.week;
+  const unlockDate = new Date(card.dataset.unlock);
+  const status = card.querySelector('.status');
+
+  if(today>=unlockDate){
+    card.classList.add('unlocked');
+    status.textContent="Άνοιξε το 💌";
+  } else {
+    status.textContent=`Ανοίγει: ${unlockDate.toLocaleDateString('el-GR')}`;
+  }
+
+  card.addEventListener('click',()=>{
+    if(card.classList.contains('unlocked')){
+      popupTitle.textContent=`Εβδομάδα ${weekNum}`;
+      popupContent.innerHTML=weekMessages[weekNum];
+      overlay.style.display='block';
+      popup.style.display='block';
+      setTimeout(()=>popup.classList.add('show'),10);
+      launchHearts(6);
+    }
+  });
+});
+
+popupClose.addEventListener('click',()=>{
+  popup.classList.remove('show');
+  setTimeout(()=>{
+    popup.style.display='none';
+    overlay.style.display='none';
+  },300);
+});
+
+function launchHearts(count){
+  for(let i=0;i<count;i++){
+    const heart=document.createElement('div');
+    heart.className='heart';
+    heart.textContent='💖';
+    heart.style.left=`${Math.random()*90+5}%`;
+    heart.style.fontSize=`${Math.random()*20+15}px`;
+    document.body.appendChild(heart);
+    setTimeout(()=>heart.remove(),2000);
+  }
+}
+
+document.addEventListener("click", function(e){
+  if(e.target.classList.contains("arrow")){
+    const wrapper = e.target.closest(".slider-wrapper");
+    const slider = wrapper.querySelector(".photo-slider");
+
+    const scrollAmount = slider.clientWidth;
+
+    if(e.target.classList.contains("left")){
+      slider.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+    } else {
+      slider.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  }
+});
+
+</script>
+
+</body>
+</html>
